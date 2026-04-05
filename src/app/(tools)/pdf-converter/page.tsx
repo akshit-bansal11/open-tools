@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import React, { useCallback, useState, useEffect } from "react";
 import {
   FileImage,
@@ -41,6 +41,7 @@ export default function PdfConverterPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
+      accentColor={getToolAccentColor("pdf-converter")}
     >
       <PdfConverterTool />
     </ToolPageShell>
@@ -531,7 +532,7 @@ function PdfConverterTool() {
                     <Button
                       onClick={handleDownloadPagesAsZip}
                       size="sm"
-                      className="h-8 gap-2 bg-blue-600 hover:bg-blue-500 border-none"
+                      className="h-8 gap-2 btn-accent"
                     >
                       <Download className="size-3.5" />
                       Download ZIP
@@ -647,7 +648,7 @@ function PdfConverterTool() {
                   <Button
                     onClick={processImageToPdf}
                     disabled={imgFiles.length === 0 || isProcessingImgToPdf}
-                    className="w-full gap-2 h-12 rounded-xl shadow-lg border-none bg-blue-600 hover:bg-blue-500 font-semibold"
+                    className="w-full gap-2 h-12 rounded-xl shadow-lg font-semibold btn-accent"
                   >
                     {isProcessingImgToPdf ? (
                       <RefreshCw className="size-4 animate-spin" />
@@ -698,7 +699,7 @@ function PdfConverterTool() {
                   <Button
                     onClick={processPdfToImg}
                     disabled={!pdfFile || isProcessingPdfToImg}
-                    className="w-full gap-2 h-12 rounded-xl shadow-lg border-none bg-blue-600 hover:bg-blue-500 font-semibold"
+                    className="w-full gap-2 h-12 rounded-xl shadow-lg font-semibold btn-accent"
                   >
                     {isProcessingPdfToImg ? (
                       <RefreshCw className="size-4 animate-spin" />

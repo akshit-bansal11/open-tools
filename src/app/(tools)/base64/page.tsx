@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useState } from "react";
 import {
@@ -23,7 +23,7 @@ export default function Base64Page() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description}>
+    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("base64")}>
       <Base64Tool />
     </ToolPageShell>
   );

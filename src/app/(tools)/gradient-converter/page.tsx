@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { ArrowRightLeft, Wand2 } from "lucide-react";
@@ -22,7 +22,7 @@ export default function GradientConverterPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description}>
+    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("gradient-converter")}>
       <GradientConverterTool />
     </ToolPageShell>
   );

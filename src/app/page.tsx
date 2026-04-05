@@ -14,13 +14,28 @@ export default function Home() {
   return (
     <div className="page-shell">
       <div className="page-grid-overlay" />
-      <main className="page-main flex gap-10 flex-col items-center">
+
+      {/* Colorful ambient orbs — fixed so they don't scroll */}
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden z-0">
+        {/* Blue — top-left */}
+        <div className="absolute -top-32 -left-24 h-[480px] w-[480px] rounded-full bg-blue-500/10 blur-[120px]" />
+        {/* Pink — top-right */}
+        <div className="absolute -top-20 right-0 h-[360px] w-[360px] rounded-full bg-pink-500/10 blur-[100px]" />
+        {/* Yellow — mid-left */}
+        <div className="absolute top-[40%] -left-20 h-[280px] w-[280px] rounded-full bg-yellow-400/8 blur-[100px]" />
+        {/* Green — mid-right */}
+        <div className="absolute top-[35%] -right-20 h-[320px] w-[320px] rounded-full bg-green-400/8 blur-[110px]" />
+        {/* Red — bottom-center */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[300px] w-[600px] rounded-full bg-red-500/6 blur-[120px]" />
+      </div>
+
+      <main className="page-main flex gap-10 flex-col items-center relative z-10">
         <section className="relative flex flex-col items-center overflow-visible rounded-2xl p-8 sm:p-10">
           <Badge
             variant="outline"
             className="flex mb-3 rounded-full gap-2 items-center badge-emerald px-4 py-2"
           >
-            <Sparkles className="size-3.5" />
+            <Sparkles className="size-3.5 text-blue-400" />
             Open-source browser utilities
           </Badge>
 
@@ -30,10 +45,14 @@ export default function Home() {
               className="pointer-events-none absolute left-1/2 top-[44%] h-28 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/15 blur-[100px] sm:h-40 sm:w-[26rem]"
             />
             <h1
-              className="relative z-10 text-4xl font-semibold tracking-tight text-neutral-100 sm:text-8xl"
+              className="relative z-10 text-4xl font-semibold tracking-tight sm:text-8xl"
               style={{
-                textShadow:
-                  "0 0 22px rgba(255,255,255,0.2), 0 0 56px rgba(255,255,255,0.12)",
+                background:
+                  "linear-gradient(135deg, #fff 0%, #84b9fbff 30%, #ffa9a9ff 70%, #fff 90%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                textShadow: "none",
               }}
             >
               Open Tools

@@ -31,15 +31,15 @@ import {
 import type { ToolCategoryDefinition, ToolDefinition } from "@/types/tool";
 
 export const toolCategories: ToolCategoryDefinition[] = [
-  { name: "Audio", icon: AudioLines },
-  { name: "Video", icon: Video },
-  { name: "Dev", icon: Code2 },
-  { name: "Images", icon: ImageIcon },
-  { name: "SVG", icon: VectorSquare },
-  { name: "Colors", icon: SwatchBook },
-  { name: "CSS", icon: FileCode2 },
-  { name: "Documents", icon: FileText },
-  { name: "Text", icon: Type },
+  { name: "Audio",     icon: AudioLines,   accentColor: "#60a5fa" }, // blue   → var(--accent-audio)
+  { name: "Video",     icon: Video,        accentColor: "#facc15" }, // yellow → var(--accent-video)
+  { name: "Dev",       icon: Code2,        accentColor: "#4ade80" }, // green  → var(--accent-dev)
+  { name: "Images",    icon: ImageIcon,    accentColor: "#f87171" }, // red    → var(--accent-images)
+  { name: "SVG",       icon: VectorSquare, accentColor: "#f472b6" }, // pink   → var(--accent-svg)
+  { name: "Colors",    icon: SwatchBook,   accentColor: "#a78bfa" }, // violet → var(--accent-colors)
+  { name: "CSS",       icon: FileCode2,    accentColor: "#fb923c" }, // orange → var(--accent-css)
+  { name: "PDF", icon: FileText,     accentColor: "#34d399" }, // emerald→ var(--accent-documents)
+  { name: "Text",      icon: Type,         accentColor: "#38bdf8" }, // sky    → var(--accent-text)
 ];
 
 export const tools: ToolDefinition[] = [
@@ -186,7 +186,7 @@ export const tools: ToolDefinition[] = [
     shortName: "Toolkit",
     description:
       "Merge multiple files, break PDFs apart by page, reorder structure, or compress files directly in your browser.",
-    category: "Documents",
+    category: "PDF",
     highlights: ["Compress documents securely natively"],
     icon: FileText,
   },
@@ -230,7 +230,7 @@ export const tools: ToolDefinition[] = [
     shortName: "Convert",
     description:
       "Merge images into a single PDF, batch convert them, or extract pages from existing PDFs as images.",
-    category: "Documents",
+    category: "PDF",
     highlights: ["Drag-to-reorder combined page layout"],
     icon: ArrowLeftRight,
   },
@@ -343,3 +343,12 @@ export const toolsByCategory = toolCategories.map((category) => ({
   ...category,
   tools: tools.filter((tool) => tool.category === category.name),
 }));
+
+/** Returns the accent color hex for the category a tool belongs to. */
+export function getToolAccentColor(slug: string): string {
+  const tool = getToolBySlug(slug);
+  if (!tool) return "#60a5fa";
+  const category = toolCategories.find((c) => c.name === tool.category);
+  return category?.accentColor ?? "#60a5fa";
+}
+

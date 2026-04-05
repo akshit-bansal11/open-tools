@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useMemo, useState } from "react";
 import { Pipette, Droplets } from "lucide-react";
@@ -22,7 +22,7 @@ export default function ColorConverterPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description}>
+    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("color-converter")}>
       <ColorConverterTool />
     </ToolPageShell>
   );

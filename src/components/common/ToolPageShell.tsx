@@ -9,6 +9,8 @@ interface ToolPageShellProps {
   title: string;
   description: string;
   children: ReactNode;
+  /** @deprecated — accent colors are no longer applied to tool pages */
+  accentColor?: string;
 }
 
 export function ToolPageShell({
@@ -22,7 +24,7 @@ export function ToolPageShell({
 
       <RepositoryCorner className="fixed right-0 top-0 z-20 p-2 sm:p-3" />
 
-      <main className="page-main">
+      <main className="page-main relative z-10">
         <div className="mb-4 flex justify-start">
           <Button
             asChild
@@ -38,10 +40,8 @@ export function ToolPageShell({
         </div>
 
         <header className="mb-8 text-center">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            <span className="bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">
-              {title}
-            </span>
+          <h1 className="text-7xl font-semibold tracking-tight text-foreground sm:text-8xl">
+            {title}
           </h1>
           {description && (
             <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">

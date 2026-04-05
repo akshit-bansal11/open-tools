@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import NextImage from "next/image";
@@ -40,7 +40,7 @@ export default function ImageCropperPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description}>
+    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("image-cropper")}>
       <ImageCropperTool />
     </ToolPageShell>
   );

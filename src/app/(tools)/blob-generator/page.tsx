@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import React, { useMemo, useState } from "react";
 import { CheckCircle2, Copy, Dices, SlidersVertical } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/layout/Card";
@@ -24,6 +24,7 @@ export default function BlobGeneratorPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
+      accentColor={getToolAccentColor("blob-generator")}
     >
       <BlobGeneratorTool />
     </ToolPageShell>

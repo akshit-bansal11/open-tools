@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useState } from "react";
 import { Download, GripVertical, Layers3, Plus, Trash2 } from "lucide-react";
@@ -35,7 +35,7 @@ export default function GradientMakerPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description}>
+    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("gradient-maker")}>
       <GradientMakerTool />
     </ToolPageShell>
   );

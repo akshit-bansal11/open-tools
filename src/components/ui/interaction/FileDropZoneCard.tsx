@@ -122,10 +122,14 @@ export function FileDropZoneCard({
         tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled}
         className={cn(
-          "drop-zone group relative flex min-h-[240px] w-full flex-col items-center justify-center gap-4 outline-none",
+          "drop-zone group relative flex min-h-[240px] w-full flex-col items-center justify-center gap-4 outline-none transition-all duration-300",
           disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
           isDragging && "drop-zone-active scale-[1.01]",
         )}
+        style={isDragging ? {
+          borderColor: "rgba(255,255,255,0.25)",
+          boxShadow: "0 0 40px rgba(255,255,255,0.06)",
+        } : undefined}
         onClick={openPicker}
         onKeyDown={(event) => {
           if (event.target !== event.currentTarget) return;
@@ -142,19 +146,26 @@ export function FileDropZoneCard({
       >
         <div
           className={cn(
-            "rounded-full border border-white/[0.08] bg-white/[0.03] p-4 transition-colors duration-300",
-            isDragging
-              ? "border-white/20 bg-white/[0.09]"
-              : "group-hover:border-white/20 group-hover:bg-white/[0.07]",
+            "rounded-full border p-4 transition-all duration-300",
           )}
+          style={{
+            borderColor: isDragging
+              ? "rgba(255,255,255,0.2)"
+              : "rgba(255,255,255,0.08)",
+            backgroundColor: isDragging
+              ? "rgba(255,255,255,0.06)"
+              : "rgba(255,255,255,0.03)",
+          }}
         >
           <FileUp
             className={cn(
               "size-8 transition-colors duration-300",
-              isDragging
-                ? "text-white/85"
-                : "text-muted-foreground group-hover:text-white/80",
             )}
+            style={{
+              color: isDragging
+                ? "rgba(255,255,255,0.9)"
+                : "rgba(255,255,255,0.4)",
+            }}
           />
         </div>
 

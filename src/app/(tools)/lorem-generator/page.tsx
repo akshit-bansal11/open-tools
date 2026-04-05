@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import React, { useState, useMemo } from "react";
 import {
   Copy,
@@ -31,6 +31,7 @@ export default function LoremGeneratorPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
+      accentColor={getToolAccentColor("lorem-generator")}
     >
       <LoremGeneratorTool />
     </ToolPageShell>

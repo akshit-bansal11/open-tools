@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import React, { useState, useCallback, useEffect } from "react";
 import {
   Merge,
@@ -43,6 +43,7 @@ export default function PdfToolkitPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
+      accentColor={getToolAccentColor("pdf-toolkit")}
     >
       <PdfToolkitTool />
     </ToolPageShell>
@@ -600,7 +601,7 @@ function PdfToolkitTool() {
                   <Button
                     onClick={executeMerge}
                     disabled={mergeFiles.length < 2 || isProcessing}
-                    className="w-full gap-2 h-12 rounded-xl shadow-lg border-none bg-blue-600 hover:bg-blue-500 font-semibold"
+                    className="w-full gap-2 h-12 rounded-xl shadow-lg font-semibold btn-accent"
                   >
                     {isProcessing ? (
                       <RefreshCw className="size-4 animate-spin" />
@@ -659,7 +660,7 @@ function PdfToolkitTool() {
                       isProcessing ||
                       (splitMode === "range" && !splitRange)
                     }
-                    className="w-full gap-2 h-12 rounded-xl shadow-lg border-none bg-blue-600 hover:bg-blue-500 font-semibold"
+                    className="w-full gap-2 h-12 rounded-xl shadow-lg font-semibold btn-accent"
                   >
                     {isProcessing ? (
                       <RefreshCw className="size-4 animate-spin" />
@@ -725,7 +726,7 @@ function PdfToolkitTool() {
                   <Button
                     onClick={executeCompress}
                     disabled={!compressFile || isProcessing}
-                    className="w-full gap-2 h-12 rounded-xl shadow-lg border-none bg-blue-600 hover:bg-blue-500 font-semibold"
+                    className="w-full gap-2 h-12 rounded-xl shadow-lg font-semibold btn-accent"
                   >
                     {isProcessing ? (
                       <RefreshCw className="size-4 animate-spin" />
@@ -748,7 +749,7 @@ function PdfToolkitTool() {
                     disabled={
                       !reorderFile || isProcessing || reorderPages.length === 0
                     }
-                    className="w-full gap-2 h-12 rounded-xl shadow-lg border-none bg-blue-600 hover:bg-blue-500 font-semibold"
+                    className="w-full gap-2 h-12 rounded-xl shadow-lg font-semibold btn-accent"
                   >
                     {isProcessing ? (
                       <RefreshCw className="size-4 animate-spin" />

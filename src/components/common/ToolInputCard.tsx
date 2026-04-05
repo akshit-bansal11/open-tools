@@ -14,10 +14,10 @@ import { cn } from "@/lib/utils";
 type ToolInputCardTone = "idle" | "converting" | "done" | "error";
 
 const toneClassNames: Record<ToolInputCardTone, string> = {
-  idle: "before:bg-transparent",
-  converting: "before:bg-primary before:opacity-80",
-  done: "before:bg-white/80",
-  error: "before:bg-red-500",
+  idle: "",
+  converting: "tool-card-converting",
+  done: "tool-card-done",
+  error: "tool-card-error",
 };
 
 function ToolInputCard({
@@ -28,10 +28,25 @@ function ToolInputCard({
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden border-white/10 bg-background/45 p-0 before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-l-[calc(theme(borderRadius.2xl))]",
+        "group relative overflow-hidden border-white/10 bg-background/45 p-0",
+        "before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-l-[calc(theme(borderRadius.2xl))] before:transition-all before:duration-300",
+        "before:[background:var(--bar-color,transparent)]",
+        tone === "done" && "before:opacity-80",
+        tone === "error" && "before:opacity-100",
+        tone === "converting" && "before:opacity-90",
         toneClassNames[tone],
         className,
       )}
+      style={{
+        "--bar-color":
+          tone === "converting"
+            ? "rgba(255,255,255,0.6)"
+            : tone === "done"
+              ? "rgba(255,255,255,0.8)"
+              : tone === "error"
+                ? "#f87171"
+                : "transparent",
+      } as React.CSSProperties}
       {...props}
     />
   );
@@ -209,7 +224,7 @@ function ToolInputCardProgress({
 }: React.ComponentProps<typeof Progress>) {
   return (
     <Progress
-      className={cn("h-2 bg-white/10 [&>div]:bg-white", className)}
+      className={cn("h-2 bg-white/10", className)}
       {...props}
     />
   );

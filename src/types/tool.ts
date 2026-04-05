@@ -14,4 +14,6 @@ export interface ToolDefinition {
 export interface ToolCategoryDefinition {
   name: string;
   icon: LucideIcon;
+  /** Tailwind arbitrary color used for accent glow, e.g. "#60a5fa" */
+  accentColor?: string;
 }

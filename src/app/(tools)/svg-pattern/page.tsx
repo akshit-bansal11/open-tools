@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug } from "@/config/tools";
+import { getToolBySlug, getToolAccentColor } from "@/config/tools";
 import React, { useMemo, useState } from "react";
 import {
   Check,
@@ -31,6 +31,7 @@ export default function SvgPatternPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
+      accentColor={getToolAccentColor("svg-pattern")}
     >
       <SvgPatternTool />
     </ToolPageShell>

@@ -7,6 +7,23 @@
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
+  /* Accent palette */
+  --accent-blue:   #60a5fa;
+  --accent-yellow: #facc15;
+  --accent-green:  #4ade80;
+  --accent-red:    #f87171;
+  --accent-pink:   #f472b6;
+
+  /* Category accent colors — one unique color per category */
+  --accent-audio:     #60a5fa; /* blue        */
+  --accent-video:     #facc15; /* yellow       */
+  --accent-dev:       #4ade80; /* green        */
+  --accent-images:    #f87171; /* red          */
+  --accent-svg:       #f472b6; /* pink         */
+  --accent-colors:    #a78bfa; /* violet       */
+  --accent-css:       #fb923c; /* orange       */
+  --accent-pdf: #34d399; /* emerald      */
+  --accent-text:      #38bdf8; /* sky          */
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -147,7 +164,9 @@
 
   .drop-zone:hover,
   .drop-zone-active {
-    @apply border-white/25 bg-white/[0.04];
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 0 32px rgba(255, 255, 255, 0.04);
   }
 
   /* Error banner */
@@ -159,6 +178,13 @@
   .badge-emerald {
     @apply flex border-white/15 bg-white/[0.06] text-white/80;
   }
+
+  /* Colored accent badges */
+  .badge-blue   { @apply flex border-blue-400/25   bg-blue-400/10   text-blue-300;   }
+  .badge-yellow { @apply flex border-yellow-400/25 bg-yellow-400/10 text-yellow-300; }
+  .badge-green  { @apply flex border-green-400/25  bg-green-400/10  text-green-300;  }
+  .badge-red    { @apply flex border-red-400/25    bg-red-400/10    text-red-300;    }
+  .badge-pink   { @apply flex border-pink-400/25   bg-pink-400/10   text-pink-300;   }
 
   .category-card-scroll {
     scrollbar-width: thin;
@@ -182,5 +208,23 @@
     display: none;
     width: 0;
     height: 0;
+  }
+
+  /* Accent-tinted primary CTA button */
+  .btn-accent {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: none;
+    transition: filter 150ms ease, transform 100ms ease;
+  }
+  .btn-accent:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+  .btn-accent:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .btn-accent:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
