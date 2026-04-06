@@ -65,6 +65,11 @@ function FramesExtractorTool() {
   const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // New features
+  const [targetFps, setTargetFps] = useState<string>("auto");
+  const [trimStart, setTrimStart] = useState<string>("");
+  const [trimEnd, setTrimEnd] = useState<string>("");
+
   const clearFrames = useCallback(() => {
     frames.forEach((frame) => URL.revokeObjectURL(frame.url));
     setFrames([]);
@@ -151,8 +156,30 @@ function FramesExtractorTool() {
 
     try {
       await ffmpeg.writeFile(inputName, await fetchFile(file));
-      const fps = await detectFps(inputName);
-      await ffmpeg.exec(["-i", inputName, "-vsync", "0", framePattern]);
+      const detectedFps = await detectFps(inputName);
+
+      const args = ["-i", inputName, "-vsync", "0"];
+
+      if (trimStart) {
+        args.splice(0, 0, "-ss", trimStart);
+      }
+      if (trimEnd) {
+        // -to must be after -i if we want it to apply to the input file according to modern ffmpeg syntax
+        // But for ffmpeg WASM, putting -ss and -to before -i enables fast seeking.
+        if (trimStart) {
+          args.splice(2, 0, "-to", trimEnd);
+        } else {
+          args.splice(0, 0, "-to", trimEnd);
+        }
+      }
+
+      if (targetFps !== "auto") {
+        args.push("-r", targetFps);
+      }
+
+      args.push(framePattern);
+
+      await ffmpeg.exec(args);
 
       const extracted: ExtractedFrame[] = [];
 
@@ -177,7 +204,9 @@ function FramesExtractorTool() {
       }
 
       setFrames(extracted);
-      setMeta({ fps, frameCount: extracted.length });
+      
+      const parsedFps = targetFps !== "auto" ? parseFloat(targetFps) : detectedFps;
+      setMeta({ fps: parsedFps, frameCount: extracted.length });
       setProgress(100);
     } catch (error) {
       const message =
@@ -191,7 +220,7 @@ function FramesExtractorTool() {
       ffmpeg.off("progress", onProgress);
       setIsExtracting(false);
     }
-  }, [clearFrames, detectFps, file]);
+  }, [clearFrames, detectFps, file, targetFps, trimStart, trimEnd]);
 
   const downloadZip = useCallback(async () => {
     if (frames.length === 0) {
@@ -279,7 +308,55 @@ function FramesExtractorTool() {
                 </Badge>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center gap-2">
+              <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Extract Frequency</label>
+                  <select
+                    className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-white/10 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
+                    value={targetFps}
+                    onChange={(e) => setTargetFps(e.target.value)}
+                    disabled={isExtracting}
+                  >
+                    <option value="auto" className="bg-background text-foreground">Extract every frame (Auto)</option>
+                    <option value="30" className="bg-background text-foreground">30 FPS</option>
+                    <option value="10" className="bg-background text-foreground">10 FPS</option>
+                    <option value="5" className="bg-background text-foreground">5 FPS</option>
+                    <option value="1" className="bg-background text-foreground">1 FPS (1 frame/sec)</option>
+                    <option value="0.5" className="bg-background text-foreground">0.5 FPS (1 frame/2s)</option>
+                    <option value="0.1" className="bg-background text-foreground">0.1 FPS (1 frame/10s)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">Start Time (sec) <span className="opacity-50 text-[10px]">Optional</span></label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="e.g. 1.5"
+                    value={trimStart}
+                    onChange={(e) => setTrimStart(e.target.value)}
+                    disabled={isExtracting}
+                    className="flex h-9 w-full rounded-md border border-white/10 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs text-muted-foreground">End Time (sec) <span className="opacity-50 text-[10px]">Optional</span></label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="e.g. 5"
+                    value={trimEnd}
+                    onChange={(e) => setTrimEnd(e.target.value)}
+                    disabled={isExtracting}
+                    className="flex h-9 w-full rounded-md border border-white/10 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center gap-2">
                 <Button
                   onClick={() => void extractFrames()}
                   disabled={isExtracting}
@@ -308,7 +385,9 @@ function FramesExtractorTool() {
                   onClick={() => {
                     setFile(null);
                     setProgress(0);
-                    setErrorMessage(null);
+                    setTrimStart("");
+                    setTrimEnd("");
+                    setTargetFps("auto");
                     clearFrames();
                   }}
                   disabled={isExtracting}

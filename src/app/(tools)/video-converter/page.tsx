@@ -73,6 +73,8 @@ interface VideoItem {
   targetFormat: VideoOutputFormat;
   videoCodec: string;
   audioCodec: string;
+  resolution: string;
+  quality: number;
   status: ConversionStatus;
   progress: number;
   error?: string;
@@ -120,6 +122,8 @@ function VideoConverterTool() {
         targetFormat,
         videoCodec: videoCodecs[0],
         audioCodec: audioCodecs[0],
+        resolution: "original",
+        quality: 23,
         status: "idle",
         progress: 0,
       };
@@ -187,15 +191,31 @@ function VideoConverterTool() {
 
       try {
         await ffmpeg.writeFile(inputName, await fetchFile(item.file));
-        await ffmpeg.exec([
-          "-i",
-          inputName,
-          "-c:v",
-          item.videoCodec,
-          "-c:a",
-          item.audioCodec,
-          outputName,
-        ]);
+        const ffmpegArgs = ["-i", inputName];
+
+        // Video codec & options
+        if (item.videoCodec === "copy") {
+          ffmpegArgs.push("-c:v", "copy");
+        } else {
+          ffmpegArgs.push("-c:v", item.videoCodec);
+
+          // Apply resolution scaling
+          if (item.resolution !== "original") {
+            ffmpegArgs.push("-vf", `scale=-2:${item.resolution}`);
+          }
+
+          // Apply CRF (Quality) for encoders that support it
+          if (["libx264", "libx265", "libvpx", "libvpx-vp9"].includes(item.videoCodec)) {
+            ffmpegArgs.push("-crf", String(item.quality));
+          }
+        }
+
+        // Audio codec
+        ffmpegArgs.push("-c:a", item.audioCodec);
+
+        ffmpegArgs.push(outputName);
+
+        await ffmpeg.exec(ffmpegArgs);
 
         const output = await ffmpeg.readFile(outputName);
         const blob = new Blob([(output as Uint8Array).slice()], { type: `video/${item.targetFormat}` });
@@ -484,6 +504,55 @@ function VideoConverterTool() {
                             }
                             disabled={item.status === "converting"}
                           />
+                        </div>
+                      </ToolInputCardField>
+
+                      <ToolInputCardField>
+                        <ToolInputCardLabel>Resolution & Quality</ToolInputCardLabel>
+                        <div className="flex items-center gap-3">
+                          <ToolInputCardSelect
+                            className="flex-1"
+                            options={[
+                              { label: "Original", value: "original" },
+                              { label: "1080p", value: "1080" },
+                              { label: "720p", value: "720" },
+                              { label: "480p", value: "480" },
+                              { label: "360p", value: "360" },
+                            ]}
+                            value={item.resolution}
+                            onChange={(event) =>
+                              updateFile(item.id, {
+                                resolution: event.target.value,
+                                status: "idle",
+                                progress: 0,
+                                error: undefined,
+                              })
+                            }
+                            disabled={item.status === "converting"}
+                          />
+                          <div className="flex-1 space-y-1.5 rounded-md border border-white/10 bg-black/20 p-2">
+                            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                              <span>CRF {item.quality}</span>
+                              <span>{item.quality < 20 ? "High Quality" : item.quality > 35 ? "Low Quality" : "Balanced"}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min={0}
+                              max={51}
+                              step={1}
+                              value={item.quality}
+                              onChange={(event) =>
+                                updateFile(item.id, {
+                                  quality: Number(event.target.value),
+                                  status: "idle",
+                                  progress: 0,
+                                  error: undefined,
+                                })
+                              }
+                              disabled={item.status === "converting" || item.videoCodec === "copy"}
+                              className="w-full accent-primary"
+                            />
+                          </div>
                         </div>
                       </ToolInputCardField>
 
