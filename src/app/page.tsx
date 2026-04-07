@@ -5,9 +5,8 @@ import { CategoryCard } from "@/components/common/CategoryCard";
 import { toolsByCategory } from "@/config/tools";
 
 const inDevelopmentSlugs = new Set([
-  // "video-converter",
-  // "frames-extractor",
   "image-cropper",
+  "pdf-toolkit",
 ]);
 
 export default function Home() {
