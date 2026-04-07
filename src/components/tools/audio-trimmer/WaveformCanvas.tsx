@@ -42,11 +42,11 @@ export interface WaveformCanvasProps {
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const WAVEFORM_COLOR = "#4ade80"; // green
-const REGION_FILL = "rgba(96, 165, 250, 0.12)"; // blue-ish overlay
-const HANDLE_COLOR = "#60a5fa"; // blue handle bars
-const HANDLE_WIDTH = 2;
-const HANDLE_HIT_SLOP = 12; // px either side → makes grab easier
+const WAVEFORM_COLOR = "#b7b7b7ff"; // green
+const REGION_FILL = "rgba(102, 102, 102, 0.12)"; // blue-ish overlay
+const HANDLE_COLOR = "#fdfdfd8e"; // blue handle bars
+const HANDLE_WIDTH = 14;
+const HANDLE_HIT_SLOP = 16; // px either side → makes grab easier
 const PLAYHEAD_COLOR = "rgba(255, 255, 255, 0.7)";
 const DIM_FILL = "rgba(0, 0, 0, 0.35)"; // outside-region dimming
 
@@ -112,33 +112,35 @@ export function WaveformCanvas({
       ctx.fillRect(0, 0, sx, H);
       ctx.fillRect(ex, 0, W - ex, H);
 
-      // 4. Trim region overlay
+      // 4. Trim region highlight overlay
       ctx.fillStyle = REGION_FILL;
       ctx.fillRect(sx, 0, ex - sx, H);
 
-      // 5. Handle bars
+      // Top and bottom borders for the selected region
+      const borderWidth = 2;
       ctx.fillStyle = HANDLE_COLOR;
-      ctx.fillRect(sx - HANDLE_WIDTH / 2, 0, HANDLE_WIDTH, H);
-      ctx.fillRect(ex - HANDLE_WIDTH / 2, 0, HANDLE_WIDTH, H);
+      ctx.fillRect(sx, 0, ex - sx, borderWidth);
+      ctx.fillRect(sx, H - borderWidth, ex - sx, borderWidth);
 
-      // 6. Handle grip caps (rounded rect at top)
-      const capW = 10;
-      const capH = 18;
-      const capR = 3;
+      // 5. Thicker, pill-shaped Handle bars
+      const handlePadding = 2;
+      const handleH = H - handlePadding * 2;
+
       for (const hx of [sx, ex]) {
-        const cx = hx - capW / 2;
+        const cx = hx - HANDLE_WIDTH / 2;
+        
+        // Handle background
         ctx.fillStyle = HANDLE_COLOR;
         ctx.beginPath();
-        ctx.roundRect(cx, 2, capW, capH, capR);
+        ctx.roundRect(cx, handlePadding, HANDLE_WIDTH, handleH, 6);
         ctx.fill();
 
-        // Three grip dots
-        ctx.fillStyle = "rgba(0,0,0,0.6)";
-        for (let dot = 0; dot < 3; dot++) {
-          ctx.beginPath();
-          ctx.arc(hx, 6 + dot * 5, 1.2, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        // Inner vertical grip lines
+        ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+        const gripH = 24;
+        const gripY = H / 2 - gripH / 2;
+        ctx.fillRect(hx - 2.5, gripY, 1.5, gripH);
+        ctx.fillRect(hx + 1.5, gripY, 1.5, gripH);
       }
     }
 
