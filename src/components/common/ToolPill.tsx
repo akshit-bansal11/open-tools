@@ -1,3 +1,6 @@
+// ToolPill.tsx
+// Individual tool link pill with category accent color and in-development state.
+
 import Link from "next/link";
 import { TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";

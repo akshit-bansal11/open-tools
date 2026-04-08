@@ -1,10 +1,10 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useState } from "react";
 import { Download, Search } from "lucide-react";
-import { CopyButton } from "@/components/design-tools/CopyButton";
+import { CopyButton } from "@/components/ui/design/CopyButton";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/form/Input";
 import { Badge } from "@/components/ui/feedback/Badge";
@@ -24,7 +24,7 @@ export default function GradientLibraryPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("gradient-library")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <GradientLibraryTool />
     </ToolPageShell>
   );

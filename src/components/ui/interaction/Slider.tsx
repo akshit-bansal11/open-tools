@@ -1,3 +1,8 @@
+// Slider.tsx
+// Range selection slider built on Radix UI primitives.
+
+"use client";
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -42,6 +47,7 @@ function Slider({
       )}
     >
       <input
+        data-slot="slider"
         type="range"
         min={min}
         max={max}

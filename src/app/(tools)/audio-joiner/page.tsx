@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/feedback/Badge";
 import { Progress } from "@/components/ui/feedback/Progress";
 import { Select } from "@/components/ui/form/Select";
 import { FileDropZoneCard } from "@/components/ui/interaction/FileDropZoneCard";
+import { WaveformCanvas } from "@/components/ui/interaction/WaveformCanvas";
 import { Card } from "@/components/ui/layout/Card";
 import {
   formatFileSize,
@@ -31,8 +32,7 @@ import {
 import {
   decodeAudioFile,
   formatDuration,
-} from "@/lib/tools/audio-trimmer/utils";
-import { WaveformCanvas } from "@/components/tools/audio-trimmer/WaveformCanvas";
+} from "@/lib/audio/utils";
 
 // ─── Page shell ──────────────────────────────────────────────────────────────
 

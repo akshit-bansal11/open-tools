@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Copy, Download, Loader2, RefreshCw } from "lucide-react";
@@ -27,7 +27,7 @@ export default function GitScaffoldPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("git-scaffold")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <GitScaffoldTool />
     </ToolPageShell>
   );

@@ -1,3 +1,6 @@
+// ColorInput.tsx
+// Input component specialized for color hex values.
+
 "use client";
 
 import * as React from "react";

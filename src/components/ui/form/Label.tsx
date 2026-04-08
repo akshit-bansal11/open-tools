@@ -1,3 +1,6 @@
+// Label.tsx
+// Form label component styled via Radix UI primitives.
+
 "use client";
 
 import * as React from "react";

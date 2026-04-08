@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useState } from "react";
 import { CheckCircle2, Copy, Search } from "lucide-react";
@@ -17,7 +17,7 @@ export default function PaletteLibraryPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("palette-library")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <PaletteLibraryTool />
     </ToolPageShell>
   );

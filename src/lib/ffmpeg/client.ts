@@ -1,3 +1,6 @@
+// client.ts
+// FFmpeg WASM client loader, specific format codecs, and file utilities.
+
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { toBlobURL } from "@ffmpeg/util";
 

@@ -11,7 +11,6 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/feedback/Badge";
 import { Progress } from "@/components/ui/feedback/Progress";
 import { FileDropZoneCard } from "@/components/ui/interaction/FileDropZoneCard";
 import { Card } from "@/components/ui/layout/Card";
@@ -65,6 +64,12 @@ function parseRanges(str: string, max: number): number[] {
     }
   }
   return Array.from(indices).sort((a, b) => a - b);
+}
+
+function bytesToPdfBlob(bytes: Uint8Array): Blob {
+  const arrayBuffer = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(arrayBuffer).set(bytes);
+  return new Blob([arrayBuffer], { type: "application/pdf" });
 }
 
 function PdfSplitterTool() {
@@ -174,7 +179,7 @@ function PdfSplitterTool() {
         pages.forEach((p) => newPdf.addPage(p));
         const bytes = await newPdf.save();
         downloadBlob(
-          new Blob([bytes], { type: "application/pdf" }),
+          bytesToPdfBlob(bytes),
           "Extracted_Pages.pdf",
         );
         setProgress(100);
@@ -207,7 +212,8 @@ function PdfSplitterTool() {
   const togglePage = (idx: number) => {
     setSelectedPages((prev) => {
       const next = new Set(prev);
-      next.has(idx) ? next.delete(idx) : next.add(idx);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
       return next;
     });
   };

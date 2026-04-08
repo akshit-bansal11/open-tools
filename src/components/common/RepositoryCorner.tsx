@@ -1,3 +1,6 @@
+// RepositoryCorner.tsx
+// Floating GitHub link button pinned to corner of the page.
+
 import { Github } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";

@@ -1,3 +1,6 @@
+// ToggleSwitch.tsx
+// Interactive switch component for turning settings on and off.
+
 "use client";
 
 import * as React from "react";

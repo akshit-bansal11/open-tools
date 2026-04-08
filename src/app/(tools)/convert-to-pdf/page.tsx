@@ -5,7 +5,6 @@ import { ToolPageShell } from "@/components/common/ToolPageShell";
 import React, { useCallback, useState } from "react";
 import {
   Download,
-  FileOutput,
   GripVertical,
   ImageIcon,
   Info,
@@ -13,7 +12,6 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/feedback/Badge";
 import { Progress } from "@/components/ui/feedback/Progress";
 import { FileDropZoneCard } from "@/components/ui/interaction/FileDropZoneCard";
 import { Card } from "@/components/ui/layout/Card";
@@ -50,6 +48,12 @@ function formatFileSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function bytesToPdfBlob(bytes: Uint8Array): Blob {
+  const arrayBuffer = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(arrayBuffer).set(bytes);
+  return new Blob([arrayBuffer], { type: "application/pdf" });
 }
 
 async function imageFileToEmbeddable(
@@ -167,7 +171,7 @@ function ConvertToPdfTool() {
           setProgress(Math.round(((i + 1) / images.length) * 90));
         }
         const bytes = await pdfDoc.save();
-        const blob = new Blob([bytes], { type: "application/pdf" });
+        const blob = bytesToPdfBlob(bytes);
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -182,7 +186,7 @@ function ConvertToPdfTool() {
           const img = await imageFileToEmbeddable(pdfDoc, images[i].file);
           buildPage(pdfDoc, img);
           const bytes = await pdfDoc.save();
-          const blob = new Blob([bytes], { type: "application/pdf" });
+          const blob = bytesToPdfBlob(bytes);
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;

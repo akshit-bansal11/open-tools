@@ -1,10 +1,10 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useCallback, useMemo, useState } from "react";
 import { Download, Play } from "lucide-react";
-import { OutputField } from "@/components/design-tools/OutputField";
+import { OutputField } from "@/components/ui/design/OutputField";
 import { Badge } from "@/components/ui/feedback/Badge";
 import { Button } from "@/components/ui/Button";
 import {
@@ -28,7 +28,7 @@ export default function SvgAnimatorPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("svg-animator")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <SvgAnimatorTool />
     </ToolPageShell>
   );

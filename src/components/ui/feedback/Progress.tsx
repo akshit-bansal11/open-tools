@@ -1,3 +1,8 @@
+// Progress.tsx
+// Visual progress bar indicator built on Radix UI primitives.
+
+"use client";
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

@@ -1,3 +1,6 @@
+// Separator.tsx
+// Visual divider line component matching the design system colors.
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

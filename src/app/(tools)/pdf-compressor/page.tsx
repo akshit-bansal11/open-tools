@@ -41,6 +41,12 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function bytesToPdfBlob(bytes: Uint8Array): Blob {
+  const arrayBuffer = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(arrayBuffer).set(bytes);
+  return new Blob([arrayBuffer], { type: "application/pdf" });
+}
+
 function PdfCompressorTool() {
   const [file, setFile] = useState<File | null>(null);
   const [pageCount, setPageCount] = useState(0);
@@ -106,7 +112,7 @@ function PdfCompressorTool() {
       }
 
       const bytes = await newPdf.save();
-      const blob = new Blob([bytes], { type: "application/pdf" });
+      const blob = bytesToPdfBlob(bytes);
       setOutputSize(blob.size);
       setOutputUrl(URL.createObjectURL(blob));
       setProgress(100);

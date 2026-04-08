@@ -5,7 +5,6 @@ import { ToolPageShell } from "@/components/common/ToolPageShell";
 import React, { useCallback, useState } from "react";
 import {
   Archive,
-  Download,
   FolderArchive,
   Loader2,
   X,

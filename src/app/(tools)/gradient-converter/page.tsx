@@ -1,10 +1,10 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { ArrowRightLeft, Wand2 } from "lucide-react";
-import { OutputField } from "@/components/design-tools/OutputField";
+import { OutputField } from "@/components/ui/design/OutputField";
 import { Textarea } from "@/components/ui/form/Textarea";
 import { Badge } from "@/components/ui/feedback/Badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/layout/Card";
@@ -22,7 +22,7 @@ export default function GradientConverterPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("gradient-converter")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <GradientConverterTool />
     </ToolPageShell>
   );

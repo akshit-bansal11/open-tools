@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import React, { useState, useMemo } from "react";
 import {
   Plus,
@@ -31,7 +31,7 @@ export default function BoxShadowPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
-      accentColor={getToolAccentColor("box-shadow")}
+     
     >
       <BoxShadowTool />
     </ToolPageShell>

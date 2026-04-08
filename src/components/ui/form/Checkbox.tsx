@@ -1,3 +1,6 @@
+// Checkbox.tsx
+// A custom checkbox control built on Radix UI primitives.
+
 "use client";
 
 import * as React from "react";
@@ -30,6 +33,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   ({ className, variant, onChange, onCheckedChange, ...props }, ref) => {
     return (
       <input
+        data-slot="checkbox"
         ref={ref}
         type="checkbox"
         className={cn(checkboxVariants({ variant }), className)}

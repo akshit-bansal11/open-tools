@@ -1,3 +1,6 @@
+// SegmentedControl.tsx
+// UI component for selecting between multiple mutually exclusive options.
+
 "use client";
 
 import * as React from "react";

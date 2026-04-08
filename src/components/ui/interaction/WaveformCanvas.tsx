@@ -7,52 +7,28 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { drawWaveform } from "@/lib/tools/audio-trimmer/utils";
-
-// ─── Types ──────────────────────────────────────────────────────────────────
+import { drawWaveform } from "@/lib/audio/utils";
 
 export interface WaveformCanvasProps {
-  /** Decoded audio buffer to render */
   audioBuffer: AudioBuffer;
-  /**
-   * 0–1 ratio of where the trim start handle sits.
-   * If undefined, no trim region is shown (read-only / preview mode).
-   */
   startRatio?: number;
-  /**
-   * 0–1 ratio of where the trim end handle sits.
-   */
   endRatio?: number;
-  /**
-   * Playhead position ratio (0–1), animated during playback.
-   */
   playheadRatio?: number;
-  /**
-   * Called when the user drags a handle.
-   * `start` and `end` are both 0–1 ratios.
-   */
   onRegionChange?: (start: number, end: number) => void;
-  /** Fixed pixel height for the canvas (defaults to 128) */
   height?: number;
-  /** Extra className for the wrapper div */
   className?: string;
-  /** Whether to show trim handles (defaults to true when start/end provided) */
   trimHandles?: boolean;
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-const WAVEFORM_COLOR = "#b7b7b7ff"; // green
-const REGION_FILL = "rgba(102, 102, 102, 0.12)"; // blue-ish overlay
-const HANDLE_COLOR = "#fdfdfd8e"; // blue handle bars
+const WAVEFORM_COLOR = "#b7b7b7ff";
+const REGION_FILL = "rgba(102, 102, 102, 0.12)";
+const HANDLE_COLOR = "#fdfdfd8e";
 const HANDLE_WIDTH = 14;
-const HANDLE_HIT_SLOP = 16; // px either side → makes grab easier
+const HANDLE_HIT_SLOP = 16;
 const PLAYHEAD_COLOR = "rgba(255, 255, 255, 0.7)";
-const DIM_FILL = "rgba(0, 0, 0, 0.35)"; // outside-region dimming
+const DIM_FILL = "rgba(0, 0, 0, 0.35)";
 
 type DragTarget = "start" | "end" | null;
-
-// ─── Component ───────────────────────────────────────────────────────────────
 
 export function WaveformCanvas({
   audioBuffer,
@@ -75,7 +51,6 @@ export function WaveformCanvas({
     endRatio !== undefined &&
     onRegionChange !== undefined;
 
-  // ── Responsive width ──────────────────────────────────────────────────────
   useLayoutEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
@@ -87,7 +62,6 @@ export function WaveformCanvas({
     return () => ro.disconnect();
   }, []);
 
-  // ── Draw ─────────────────────────────────────────────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -97,45 +71,37 @@ export function WaveformCanvas({
     const W = canvas.width;
     const H = canvas.height;
 
-    // 1. Clear
     ctx.clearRect(0, 0, W, H);
 
-    // 2. Waveform
     drawWaveform(canvas, audioBuffer, WAVEFORM_COLOR);
 
     if (hasRegion && startRatio !== undefined && endRatio !== undefined) {
       const sx = startRatio * W;
       const ex = endRatio * W;
 
-      // 3. Dim outside-region
       ctx.fillStyle = DIM_FILL;
       ctx.fillRect(0, 0, sx, H);
       ctx.fillRect(ex, 0, W - ex, H);
 
-      // 4. Trim region highlight overlay
       ctx.fillStyle = REGION_FILL;
       ctx.fillRect(sx, 0, ex - sx, H);
 
-      // Top and bottom borders for the selected region
       const borderWidth = 2;
       ctx.fillStyle = HANDLE_COLOR;
       ctx.fillRect(sx, 0, ex - sx, borderWidth);
       ctx.fillRect(sx, H - borderWidth, ex - sx, borderWidth);
 
-      // 5. Thicker, pill-shaped Handle bars
       const handlePadding = 2;
       const handleH = H - handlePadding * 2;
 
       for (const hx of [sx, ex]) {
         const cx = hx - HANDLE_WIDTH / 2;
-        
-        // Handle background
+
         ctx.fillStyle = HANDLE_COLOR;
         ctx.beginPath();
         ctx.roundRect(cx, handlePadding, HANDLE_WIDTH, handleH, 6);
         ctx.fill();
 
-        // Inner vertical grip lines
         ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
         const gripH = 24;
         const gripY = H / 2 - gripH / 2;
@@ -144,7 +110,6 @@ export function WaveformCanvas({
       }
     }
 
-    // 7. Playhead
     if (playheadRatio !== undefined && playheadRatio >= 0) {
       const px = playheadRatio * W;
       ctx.strokeStyle = PLAYHEAD_COLOR;
@@ -156,7 +121,6 @@ export function WaveformCanvas({
     }
   }, [audioBuffer, canvasWidth, startRatio, endRatio, playheadRatio, hasRegion]);
 
-  // ── Pointer events ────────────────────────────────────────────────────────
   const ratioFromEvent = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       const canvas = canvasRef.current;
@@ -169,8 +133,9 @@ export function WaveformCanvas({
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!hasRegion || startRatio === undefined || endRatio === undefined)
+      if (!hasRegion || startRatio === undefined || endRatio === undefined) {
         return;
+      }
       const r = ratioFromEvent(e);
       const W = canvasRef.current?.getBoundingClientRect().width ?? 1;
       const slop = HANDLE_HIT_SLOP / W;
@@ -208,11 +173,11 @@ export function WaveformCanvas({
     dragTarget.current = null;
   }, []);
 
-  // ── Cursor ────────────────────────────────────────────────────────────────
   const getCursor = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!hasRegion || startRatio === undefined || endRatio === undefined)
+      if (!hasRegion || startRatio === undefined || endRatio === undefined) {
         return;
+      }
       const canvas = canvasRef.current;
       if (!canvas) return;
       const r = ratioFromEvent(e);
@@ -235,7 +200,7 @@ export function WaveformCanvas({
         ref={canvasRef}
         width={canvasWidth}
         height={height}
-        className="block h-full w-full"
+        className="block h-full w-full touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={(e) => {
           getCursor(e);
@@ -243,6 +208,7 @@ export function WaveformCanvas({
         }}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
+        onPointerLeave={handlePointerUp}
       />
     </div>
   );

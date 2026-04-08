@@ -1,3 +1,6 @@
+// OutputField.tsx
+// Read-only text area with an integrated copy button for design tool outputs.
+
 import { CopyButton } from "@/components/ui/design/CopyButton";
 import { Label } from "@/components/ui/form/Label";
 import { cn } from "@/lib/utils";

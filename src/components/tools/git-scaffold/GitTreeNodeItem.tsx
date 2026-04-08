@@ -1,3 +1,6 @@
+// GitTreeNodeItem.tsx
+// Recursive tree node item for the git scaffold viewer component.
+
 import { File, Folder, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import type { TreeNode } from "@/lib/tools/git-scaffold/types";

@@ -1,3 +1,6 @@
+// CategoryCard.tsx
+// Renders a category section with accent-colored header and a grid of tool pills.
+
 import { ToolPill } from "@/components/common/ToolPill";
 import type { ToolCategoryDefinition, ToolDefinition } from "@/types/tool";
 
@@ -22,27 +25,23 @@ export function CategoryCard({
         style={
           {
             "--accent": accent,
-            // Pre-computed for use in arbitrary Tailwind group-hover classes
-            "--accent-border": `${accent}66`,   // 40% alpha — icon border on hover
-            "--accent-bg": `${accent}24`,   // 14% alpha — icon bg on hover
-            "--accent-shadow": `${accent}48`,   // 28% alpha — glow colour
+            "--accent-border": `${accent}66`,
+            "--accent-bg": `${accent}24`,
+            "--accent-shadow": `${accent}48`,
           } as React.CSSProperties
         }
       >
-        {/* Accent top-edge glow strip */}
         <div
           className="h-[2px] w-full opacity-70 transition-opacity duration-300 group-hover:opacity-100"
           style={{ background: `linear-gradient(90deg, transparent, ${accent}88, transparent)` }}
         />
 
-        {/* Card header */}
         <div className="border-b border-white/8 bg-[linear-gradient(180deg,rgba(44,44,44,0.52)_0%,rgba(31,31,31,0.38)_100%)] p-2">
           <div className="flex justify-between items-center relative rounded-2xl border border-white/8 bg-white/[0.015] lg:p-4 md:p-3 sm:p-2 p-2">
             <h2 className="lg:text-4xl md:text-3xl sm:text-2xl text-xl font-medium tracking-[-0.04em] text-foreground">
               {category.name}
             </h2>
 
-            {/* Icon button — group-hover applies colored border, bg, and glow via Tailwind arbitrary vars */}
             <div
               className="w-min rounded-2xl border p-3 transition-all duration-300
                 group-hover:border-[var(--accent-border)]
@@ -66,10 +65,8 @@ export function CategoryCard({
           </div>
         </div>
 
-        {/* Tools list */}
         <div className="bg-white/[0.02] backdrop-blur-md px-6 py-6 sm:px-7 sm:py-7">
           <div className="mb-4 flex items-center justify-between border-b border-white/8 pb-3 text-xs uppercase tracking-[0.16em] text-white/40">
-            {/* Left-side accent strip on the "Tools" label */}
             <span
               className="border-l-2 pl-2 transition-colors duration-300"
               style={{ borderColor: `${accent}66` }}

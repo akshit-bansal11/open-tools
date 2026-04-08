@@ -1,11 +1,11 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useEffect, useState } from "react";
 import { CheckCircle2, Copy, KeyRound, Loader2 } from "lucide-react";
-import { CopyButton } from "@/components/design-tools/CopyButton";
-import { GeminiApiKeyDialog } from "@/components/design-tools/GeminiApiKeyDialog";
+import { CopyButton } from "@/components/ui/design/CopyButton";
+import { GeminiApiKeyDialog } from "@/components/ui/design/GeminiApiKeyDialog";
 import { Badge } from "@/components/ui/feedback/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/layout/Card";
@@ -24,7 +24,7 @@ export default function PaletteExtractorPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("palette-extractor")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <PaletteExtractorTool />
     </ToolPageShell>
   );

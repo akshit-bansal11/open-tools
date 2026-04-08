@@ -1,30 +1,22 @@
+// page.tsx
+// Home page displaying all tool categories in a card grid layout.
+
 import { Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/feedback/Badge";
-import { SiteFooter } from "@/components/ui/layout/SiteFooter";
 import { CategoryCard } from "@/components/common/CategoryCard";
+import { inDevelopmentSlugs } from "@/data/inDevelopmentSlugs";
 import { toolsByCategory } from "@/config/tools";
-
-const inDevelopmentSlugs = new Set([
-  "image-cropper",
-  "pdf-toolkit",
-]);
 
 export default function Home() {
   return (
     <div className="page-shell">
       <div className="page-grid-overlay" />
 
-      {/* Colorful ambient orbs — fixed so they don't scroll */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden z-0">
-        {/* Blue — top-left */}
         <div className="absolute -top-32 -left-24 h-[480px] w-[480px] rounded-full bg-blue-500/10 blur-[120px]" />
-        {/* Pink — top-right */}
         <div className="absolute -top-20 right-0 h-[360px] w-[360px] rounded-full bg-pink-500/10 blur-[100px]" />
-        {/* Yellow — mid-left */}
         <div className="absolute top-[40%] -left-20 h-[280px] w-[280px] rounded-full bg-yellow-400/8 blur-[100px]" />
-        {/* Green — mid-right */}
         <div className="absolute top-[35%] -right-20 h-[320px] w-[320px] rounded-full bg-green-400/8 blur-[110px]" />
-        {/* Red — bottom-center */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[300px] w-[600px] rounded-full bg-red-500/6 blur-[120px]" />
       </div>
 
@@ -75,8 +67,6 @@ export default function Home() {
             ))}
           </div>
         </section>
-
-        <SiteFooter className="mt-12 border-t border-white/5 pt-8" />
       </main>
     </div>
   );

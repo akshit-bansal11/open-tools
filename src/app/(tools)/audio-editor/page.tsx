@@ -27,6 +27,7 @@ import { Select } from "@/components/ui/form/Select";
 import { Slider } from "@/components/ui/interaction/Slider";
 import { FileDropZoneCard } from "@/components/ui/interaction/FileDropZoneCard";
 import { Card } from "@/components/ui/layout/Card";
+import { WaveformCanvas } from "@/components/ui/interaction/WaveformCanvas";
 import {
   formatFileSize,
   getFFmpeg,
@@ -37,8 +38,7 @@ import {
 import {
   decodeAudioFile,
   formatDuration,
-} from "@/lib/tools/audio-trimmer/utils";
-import { WaveformCanvas } from "@/components/tools/audio-trimmer/WaveformCanvas";
+} from "@/lib/audio/utils";
 
 // ─── Page shell ──────────────────────────────────────────────────────────────
 
@@ -64,6 +64,9 @@ const OUTPUT_FORMATS = [
   { label: "AAC",  value: "aac"  },
   { label: "OPUS", value: "opus" },
 ];
+
+const SPEED_PRESETS = [0.5, 0.75, 1, 1.25, 1.5, 2];
+const PITCH_PRESETS = [-12, -7, -5, 0, 5, 7, 12];
 
 const CODEC_FOR_FORMAT: Record<string, string> = {
   mp3:  "libmp3lame",
@@ -139,6 +142,36 @@ function buildFilterChain(params: {
   return filters.length > 0 ? filters.join(",") : null;
 }
 
+async function probeAudioSampleRate(
+  ffmpeg: Awaited<ReturnType<typeof getFFmpeg>>,
+  inputName: string,
+): Promise<number | null> {
+  const logs: string[] = [];
+
+  const onLog = ({ message }: { message: string }) => {
+    logs.push(message);
+  };
+
+  ffmpeg.on("log", onLog);
+
+  try {
+    await ffmpeg.exec(["-i", inputName]);
+  } catch {
+    // Probe-only command exits non-zero; the log output is still usable.
+  } finally {
+    ffmpeg.off("log", onLog);
+  }
+
+  for (const line of logs) {
+    const match = line.match(/Audio:[^]*?(\d{4,6})\s+Hz/i);
+    if (!match) continue;
+    const parsed = Number.parseInt(match[1], 10);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+
+  return null;
+}
+
 // ─── SectionLabel helper ──────────────────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -212,14 +245,13 @@ function AudioEditorTool() {
   const [treble, setTreble] = useState(0);
 
   // Playback
-  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
-  const bassNodeRef = useRef<BiquadFilterNode | null>(null);
-  const midNodeRef = useRef<BiquadFilterNode | null>(null);
-  const trebleNodeRef = useRef<BiquadFilterNode | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const inputUrlRef = useRef<string | null>(null);
+  const renderedPreviewUrlRef = useRef<string | null>(null);
+  const renderedPreviewKeyRef = useRef<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPreparingPreview, setIsPreparingPreview] = useState(false);
   const [playhead, setPlayhead] = useState(0);
-  const playStartWallRef = useRef(0);
-  const playOffsetRef = useRef(0);
   const rafRef = useRef(0);
 
   // Output
@@ -234,21 +266,14 @@ function AudioEditorTool() {
   const playheadRatio = duration > 0 ? playhead / duration : 0;
 
   // ── Live EQ node updates ─────────────────────────────────────────────────
-  useEffect(() => {
-    if (bassNodeRef.current) bassNodeRef.current.gain.value = bass;
-  }, [bass]);
-  useEffect(() => {
-    if (midNodeRef.current) midNodeRef.current.gain.value = mid;
-  }, [mid]);
-  useEffect(() => {
-    if (trebleNodeRef.current) trebleNodeRef.current.gain.value = treble;
-  }, [treble]);
 
   // ── Cleanup ───────────────────────────────────────────────────────────────
   useEffect(() => {
     return () => {
       stopPlayback();
       if (outputUrl) URL.revokeObjectURL(outputUrl);
+      if (inputUrlRef.current) URL.revokeObjectURL(inputUrlRef.current);
+      if (renderedPreviewUrlRef.current) URL.revokeObjectURL(renderedPreviewUrlRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -270,6 +295,13 @@ function AudioEditorTool() {
     setBass(0);
     setMid(0);
     setTreble(0);
+    renderedPreviewKeyRef.current = null;
+    if (inputUrlRef.current) URL.revokeObjectURL(inputUrlRef.current);
+    inputUrlRef.current = URL.createObjectURL(f);
+    if (renderedPreviewUrlRef.current) {
+      URL.revokeObjectURL(renderedPreviewUrlRef.current);
+      renderedPreviewUrlRef.current = null;
+    }
 
     try {
       const buf = await decodeAudioFile(f);
@@ -280,7 +312,7 @@ function AudioEditorTool() {
       setError("Failed to decode audio. Is the file corrupted or unsupported?");
       setStatus("error");
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Trim handles ─────────────────────────────────────────────────────────
   const handleRegionChange = useCallback(
@@ -309,75 +341,192 @@ function AudioEditorTool() {
   );
 
   // ── Playback ──────────────────────────────────────────────────────────────
+  const previewKey = `${file?.name ?? ""}:${file?.lastModified ?? 0}:${startTime}:${endTime}:${speed}:${pitchSemitones}:${bass}:${mid}:${treble}`;
+  const needsRenderedPreview =
+    Math.abs(pitchSemitones) > 0.001 ||
+    Math.abs(bass) > 0.1 ||
+    Math.abs(mid) > 0.1 ||
+    Math.abs(treble) > 0.1;
+
   function stopPlayback() {
     cancelAnimationFrame(rafRef.current);
-    try { sourceRef.current?.stop(); } catch {}
-    sourceRef.current = null;
-    bassNodeRef.current = null;
-    midNodeRef.current = null;
-    trebleNodeRef.current = null;
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
     setIsPlaying(false);
+    setIsPreparingPreview(false);
   }
 
-  const startPlayback = useCallback(() => {
-    if (!audioBuffer) return;
+  const syncPreviewPlayhead = useCallback(
+    (rendered: boolean) => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      const tick = () => {
+        const currentTime = audio.currentTime;
+        const nextPlayhead = rendered
+          ? Math.min(startTime + currentTime * speed, endTime)
+          : Math.min(currentTime, endTime);
+
+        setPlayhead(nextPlayhead);
+
+        if (rendered) {
+          const renderedDuration = (endTime - startTime) / Math.max(speed, 0.01);
+          if (currentTime >= renderedDuration) {
+            audio.pause();
+            setIsPlaying(false);
+            setPlayhead(startTime);
+            return;
+          }
+        } else if (currentTime >= endTime) {
+          audio.pause();
+          setIsPlaying(false);
+          setPlayhead(startTime);
+          return;
+        }
+
+        if (!audio.paused && !audio.ended) {
+          rafRef.current = requestAnimationFrame(tick);
+        }
+      };
+
+      rafRef.current = requestAnimationFrame(tick);
+    },
+    [endTime, speed, startTime],
+  );
+
+  const playAudioElement = useCallback(
+    async (src: string, rendered: boolean) => {
+      let audio = audioRef.current;
+      if (!audio) {
+        audio = new Audio();
+        audioRef.current = audio;
+      }
+
+      audio.pause();
+      audio.src = src;
+      audio.onended = () => {
+        cancelAnimationFrame(rafRef.current);
+        setIsPlaying(false);
+        setPlayhead(startTime);
+      };
+
+      if (rendered) {
+        audio.playbackRate = 1;
+        audio.currentTime = 0;
+      } else {
+        audio.playbackRate = speed;
+        if ("preservesPitch" in audio) {
+          (audio as HTMLAudioElement & { preservesPitch: boolean }).preservesPitch = true;
+        }
+        audio.currentTime = startTime;
+      }
+
+      await audio.play();
+      setIsPlaying(true);
+      syncPreviewPlayhead(rendered);
+    },
+    [speed, startTime, syncPreviewPlayhead],
+  );
+
+  const renderPreview = useCallback(async () => {
+    if (!file || !audioBuffer) return null;
+
+    const ffmpeg = await getFFmpeg();
+    const jobId = uid("preview");
+    const srcExt = getFileExtension(file.name) || "mp3";
+    const inputName = `${jobId}_in.${srcExt}`;
+    const outputName = `${jobId}_preview.wav`;
+
+    await ffmpeg.writeFile(inputName, await fetchFile(file));
+    const sampleRate =
+      (await probeAudioSampleRate(ffmpeg, inputName)) ?? audioBuffer.sampleRate;
+    const filterChain = buildFilterChain({
+      speed,
+      pitchSemitones,
+      bass,
+      mid,
+      treble,
+      sampleRate,
+    });
+
+    const args = ["-i", inputName, "-ss", String(startTime), "-to", String(endTime)];
+    if (filterChain) {
+      args.push("-filter:a", filterChain);
+    }
+    args.push("-c:a", "pcm_s16le", outputName);
+
+    await ffmpeg.exec(args);
+
+    const out = await ffmpeg.readFile(outputName);
+    const blob = new Blob([(out as Uint8Array).slice()], {
+      type: "audio/wav",
+    });
+
+    if (renderedPreviewUrlRef.current) {
+      URL.revokeObjectURL(renderedPreviewUrlRef.current);
+    }
+    renderedPreviewUrlRef.current = URL.createObjectURL(blob);
+    renderedPreviewKeyRef.current = previewKey;
+    return renderedPreviewUrlRef.current;
+  }, [
+    audioBuffer,
+    bass,
+    endTime,
+    file,
+    mid,
+    pitchSemitones,
+    previewKey,
+    speed,
+    startTime,
+    treble,
+  ]);
+
+  const startPlayback = useCallback(async () => {
+    if (!audioBuffer || !file) return;
     stopPlayback();
+    setError(null);
 
-    const ctx = new AudioContext();
+    try {
+      if (needsRenderedPreview) {
+        setIsPreparingPreview(true);
+        try {
+          const previewUrl =
+            renderedPreviewKeyRef.current === previewKey && renderedPreviewUrlRef.current
+              ? renderedPreviewUrlRef.current
+              : await renderPreview();
+          if (!previewUrl) return;
+          await playAudioElement(previewUrl, true);
+        } finally {
+          setIsPreparingPreview(false);
+        }
+        return;
+      }
 
-    // EQ chain
-    const bassF = ctx.createBiquadFilter();
-    bassF.type = "lowshelf";
-    bassF.frequency.value = 100;
-    bassF.gain.value = bass;
-    bassNodeRef.current = bassF;
-
-    const midF = ctx.createBiquadFilter();
-    midF.type = "peaking";
-    midF.frequency.value = 1000;
-    midF.Q.value = 1.4;
-    midF.gain.value = mid;
-    midNodeRef.current = midF;
-
-    const trebleF = ctx.createBiquadFilter();
-    trebleF.type = "highshelf";
-    trebleF.frequency.value = 8000;
-    trebleF.gain.value = treble;
-    trebleNodeRef.current = trebleF;
-
-    const src = ctx.createBufferSource();
-    src.buffer = audioBuffer;
-    // Speed + approximate pitch preview via playbackRate
-    const pitchFactor = Math.pow(2, pitchSemitones / 12);
-    src.playbackRate.value = speed * pitchFactor;
-    src.connect(bassF).connect(midF).connect(trebleF).connect(ctx.destination);
-
-    src.onended = () => {
+      if (!inputUrlRef.current) {
+        inputUrlRef.current = URL.createObjectURL(file);
+      }
+      await playAudioElement(inputUrlRef.current, false);
+    } catch (e) {
       setIsPlaying(false);
-      setPlayhead(startTime);
-      cancelAnimationFrame(rafRef.current);
-    };
-
-    const clipDuration = endTime - startTime;
-    src.start(0, startTime, clipDuration / (speed * pitchFactor));
-    sourceRef.current = src;
-    playStartWallRef.current = performance.now();
-    playOffsetRef.current = startTime;
-    setIsPlaying(true);
-
-    const tick = () => {
-      const elapsed = (performance.now() - playStartWallRef.current) / 1000 * speed * pitchFactor;
-      const pos = Math.min(playOffsetRef.current + elapsed, endTime);
-      setPlayhead(pos);
-      if (pos < endTime) rafRef.current = requestAnimationFrame(tick);
-    };
-    rafRef.current = requestAnimationFrame(tick);
-  }, [audioBuffer, startTime, endTime, speed, pitchSemitones, bass, mid, treble]);
+      setIsPreparingPreview(false);
+      setError(e instanceof Error ? e.message : "Preview failed.");
+    }
+  }, [
+    audioBuffer,
+    file,
+    needsRenderedPreview,
+    playAudioElement,
+    previewKey,
+    renderPreview,
+  ]);
 
   const togglePlayback = useCallback(() => {
-    if (isPlaying) stopPlayback();
-    else startPlayback();
-  }, [isPlaying, startPlayback]);
+    if (isPlaying || isPreparingPreview) stopPlayback();
+    else void startPlayback();
+  }, [isPlaying, isPreparingPreview, startPlayback]);
 
   // ── Export ────────────────────────────────────────────────────────────────
   const exportAudio = useCallback(async () => {
@@ -395,15 +544,6 @@ function AudioEditorTool() {
     const srcExt = getFileExtension(file.name) || "mp3";
     const inputName = `${jobId}_in.${srcExt}`;
     const outputName = `${stripExtension(file.name)}_edited.${outputFormat}`;
-
-    const filterChain = buildFilterChain({
-      speed,
-      pitchSemitones,
-      bass,
-      mid,
-      treble,
-      sampleRate: audioBuffer.sampleRate,
-    });
 
     let targetProgress = 0;
     const onProgress = ({ progress: r }: { progress: number }) => {
@@ -423,6 +563,18 @@ function AudioEditorTool() {
 
     try {
       await ffmpeg.writeFile(inputName, await fetchFile(file));
+
+      const sampleRate =
+        (await probeAudioSampleRate(ffmpeg, inputName)) ?? audioBuffer.sampleRate;
+
+      const filterChain = buildFilterChain({
+        speed,
+        pitchSemitones,
+        bass,
+        mid,
+        treble,
+        sampleRate,
+      });
 
       const args = ["-i", inputName, "-ss", String(startTime), "-to", String(endTime)];
 
@@ -450,7 +602,7 @@ function AudioEditorTool() {
       cancelAnimationFrame(animRaf);
       ffmpeg.off("progress", onProgress);
     }
-  }, [file, audioBuffer, startTime, endTime, speed, pitchSemitones, bass, mid, treble, outputFormat, outputUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [file, audioBuffer, startTime, endTime, speed, pitchSemitones, bass, mid, treble, outputFormat, outputUrl]);
 
   const downloadOutput = useCallback(() => {
     if (!outputUrl || !file) return;
@@ -469,8 +621,17 @@ function AudioEditorTool() {
     setProgress(0);
     setPlayhead(0);
     if (outputUrl) URL.revokeObjectURL(outputUrl);
+    if (inputUrlRef.current) {
+      URL.revokeObjectURL(inputUrlRef.current);
+      inputUrlRef.current = null;
+    }
+    if (renderedPreviewUrlRef.current) {
+      URL.revokeObjectURL(renderedPreviewUrlRef.current);
+      renderedPreviewUrlRef.current = null;
+    }
+    renderedPreviewKeyRef.current = null;
     setOutputUrl(null);
-  }, [outputUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [outputUrl]);
 
   const isActive = audioBuffer && file &&
     (status === "ready" || status === "exporting" || status === "done");
@@ -539,7 +700,13 @@ function AudioEditorTool() {
                 onClick={togglePlayback}
                 disabled={status === "exporting"}
               >
-                {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
+                {isPreparingPreview ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : isPlaying ? (
+                  <Pause className="size-4" />
+                ) : (
+                  <Play className="size-4" />
+                )}
               </Button>
 
               <span className="shrink-0 font-mono text-sm tabular-nums text-muted-foreground">
@@ -586,45 +753,59 @@ function AudioEditorTool() {
             {/* ── Speed & Pitch ── */}
             <div className="px-5 py-4">
               <SectionLabel>Speed &amp; Pitch</SectionLabel>
-              <div className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
-                <SliderRow
-                  label="Speed"
-                  value={speed}
-                  min={0.25}
-                  max={4}
-                  step={0.05}
-                  display={`${speed.toFixed(2)}×`}
-                  onChange={setSpeed}
-                  disabled={status === "exporting"}
-                />
-                <SliderRow
-                  label="Pitch"
-                  value={pitchSemitones}
-                  min={-12}
-                  max={12}
-                  step={0.5}
-                  display={pitchSemitones === 0 ? "0 st" : `${pitchSemitones > 0 ? "+" : ""}${pitchSemitones} st`}
-                  onChange={setPitchSemitones}
-                  disabled={status === "exporting"}
-                />
-                <div className="col-span-2 flex items-end gap-3 lg:col-span-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 border border-white/10 px-2 text-[10px] text-muted-foreground"
-                    onClick={() => { setSpeed(0.5); }}
-                  >0.5×</Button>
-                  {[0.75, 1, 1.25, 1.5, 2].map((s) => (
-                    <Button
-                      key={s}
-                      variant="ghost"
-                      size="sm"
-                      className={`h-7 border border-white/10 px-2 text-[10px] ${Math.abs(speed - s) < 0.01 ? "border-white/30 text-foreground" : "text-muted-foreground"}`}
-                      onClick={() => setSpeed(s)}
-                    >
-                      {s}×
-                    </Button>
-                  ))}
+              <div className="grid gap-8 lg:grid-cols-2">
+                <div className="space-y-3">
+                  <SliderRow
+                    label="Speed"
+                    value={speed}
+                    min={0.25}
+                    max={4}
+                    step={0.05}
+                    display={`${speed.toFixed(2)}×`}
+                    onChange={setSpeed}
+                    disabled={status === "exporting"}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {SPEED_PRESETS.map((preset) => (
+                      <Button
+                        key={preset}
+                        variant="ghost"
+                        size="sm"
+                        className={`h-7 border border-white/10 px-2 text-[10px] ${Math.abs(speed - preset) < 0.01 ? "border-white/30 text-foreground" : "text-muted-foreground"}`}
+                        onClick={() => setSpeed(preset)}
+                        disabled={status === "exporting"}
+                      >
+                        {preset}×
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <SliderRow
+                    label="Pitch"
+                    value={pitchSemitones}
+                    min={-12}
+                    max={12}
+                    step={0.5}
+                    display={pitchSemitones === 0 ? "0 st" : `${pitchSemitones > 0 ? "+" : ""}${pitchSemitones} st`}
+                    onChange={setPitchSemitones}
+                    disabled={status === "exporting"}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {PITCH_PRESETS.map((preset) => (
+                      <Button
+                        key={preset}
+                        variant="ghost"
+                        size="sm"
+                        className={`h-7 border border-white/10 px-2 text-[10px] ${Math.abs(pitchSemitones - preset) < 0.01 ? "border-white/30 text-foreground" : "text-muted-foreground"}`}
+                        onClick={() => setPitchSemitones(preset)}
+                        disabled={status === "exporting"}
+                      >
+                        {preset === 0 ? "0 st" : `${preset > 0 ? "+" : ""}${preset} st`}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

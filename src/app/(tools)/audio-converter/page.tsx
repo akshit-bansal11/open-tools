@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchFile } from "@ffmpeg/util";
@@ -49,7 +49,7 @@ export default function AudioConverterPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("audio-converter")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <AudioConverterTool />
     </ToolPageShell>
   );

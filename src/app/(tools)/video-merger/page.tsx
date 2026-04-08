@@ -114,11 +114,18 @@ function VideoMergerTool() {
 
   const dragIdRef = useRef<string | null>(null);
   const dragOverIdRef = useRef<string | null>(null);
+  const unmountUrlRef = useRef(outputUrl);
+  const unmountTracksRef = useRef(tracks);
+
+  useEffect(() => {
+    unmountUrlRef.current = outputUrl;
+    unmountTracksRef.current = tracks;
+  }, [outputUrl, tracks]);
 
   useEffect(() => {
     return () => {
-      if (outputUrl) URL.revokeObjectURL(outputUrl);
-      tracks.forEach((t) => {
+      if (unmountUrlRef.current) URL.revokeObjectURL(unmountUrlRef.current);
+      unmountTracksRef.current.forEach((t) => {
         if (t.thumbnailUrl) URL.revokeObjectURL(t.thumbnailUrl);
       });
     };
@@ -196,7 +203,7 @@ function VideoMergerTool() {
     const jobId = uid("vmrg");
 
     try {
-      let processedNames: string[] = [];
+      const processedNames: string[] = [];
 
       if (normalizeRes) {
         // Get resolution of first track

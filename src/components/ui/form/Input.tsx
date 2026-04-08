@@ -1,5 +1,8 @@
 "use client";
 
+// Input.tsx
+// Standard text input component with focus state styling.
+
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
@@ -28,6 +31,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, variant, ...props }, ref) => {
     return (
       <input
+        data-slot="input"
         type={type}
         className={cn(inputVariants({ variant }), className)}
         ref={ref}

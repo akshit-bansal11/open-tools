@@ -1,3 +1,6 @@
+// site.ts
+// Global site metadata, author info, and social links.
+
 export const siteConfig = {
   name: "open-tools",
   description:

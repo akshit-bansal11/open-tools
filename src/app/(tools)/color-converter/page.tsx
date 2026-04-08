@@ -1,10 +1,10 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useMemo, useState } from "react";
 import { Pipette, Droplets } from "lucide-react";
-import { OutputField } from "@/components/design-tools/OutputField";
+import { OutputField } from "@/components/ui/design/OutputField";
 import { Input } from "@/components/ui/form/Input";
 import { Badge } from "@/components/ui/feedback/Badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/layout/Card";
@@ -22,7 +22,7 @@ export default function ColorConverterPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("color-converter")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <ColorConverterTool />
     </ToolPageShell>
   );

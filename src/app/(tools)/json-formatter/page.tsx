@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useMemo, useState } from "react";
 import {
@@ -24,7 +24,7 @@ export default function JsonFormatterPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("json-formatter")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <JsonFormatter />
     </ToolPageShell>
   );

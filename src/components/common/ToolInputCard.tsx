@@ -1,3 +1,6 @@
+// ToolInputCard.tsx
+// Compound UI component for building consistent, structured file input and action cards.
+
 "use client";
 
 import * as React from "react";

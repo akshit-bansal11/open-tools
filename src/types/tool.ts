@@ -1,3 +1,6 @@
+// tool.ts
+// Shared type definitions for tool and category registry entries.
+
 import type { LucideIcon } from "lucide-react";
 
 export interface ToolDefinition {
@@ -14,6 +17,5 @@ export interface ToolDefinition {
 export interface ToolCategoryDefinition {
   name: string;
   icon: LucideIcon;
-  /** Tailwind arbitrary color used for accent glow, e.g. "#60a5fa" */
   accentColor?: string;
 }

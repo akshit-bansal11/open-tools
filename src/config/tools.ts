@@ -1,3 +1,6 @@
+// tools.ts
+// Tool registry: all tool definitions, categories, and derived lookup helpers.
+
 import {
   ArrowLeftRight,
   AudioLines,
@@ -43,15 +46,15 @@ import {
 import type { ToolCategoryDefinition, ToolDefinition } from "@/types/tool";
 
 export const toolCategories: ToolCategoryDefinition[] = [
-  { name: "Audio",     icon: AudioLines,   accentColor: "#60a5fa" }, // blue   → var(--accent-audio)
-  { name: "Video",     icon: Video,        accentColor: "#facc15" }, // yellow → var(--accent-video)
-  { name: "Dev",       icon: Code2,        accentColor: "#4ade80" }, // green  → var(--accent-dev)
-  { name: "Images",    icon: ImageIcon,    accentColor: "#f87171" }, // red    → var(--accent-images)
-  { name: "SVG",       icon: VectorSquare, accentColor: "#f472b6" }, // pink   → var(--accent-svg)
-  { name: "Colors",    icon: SwatchBook,   accentColor: "#a78bfa" }, // violet → var(--accent-colors)
-  { name: "CSS",       icon: FileCode2,    accentColor: "#fb923c" }, // orange → var(--accent-css)
-  { name: "PDF", icon: FileText,     accentColor: "#34d399" }, // emerald→ var(--accent-documents)
-  { name: "Text",      icon: Type,         accentColor: "#38bdf8" }, // sky    → var(--accent-text)
+  { name: "Audio",     icon: AudioLines,   accentColor: "#60a5fa" },
+  { name: "Video",     icon: Video,        accentColor: "#facc15" },
+  { name: "Dev",       icon: Code2,        accentColor: "#4ade80" },
+  { name: "Images",    icon: ImageIcon,    accentColor: "#f87171" },
+  { name: "SVG",       icon: VectorSquare, accentColor: "#f472b6" },
+  { name: "Colors",    icon: SwatchBook,   accentColor: "#a78bfa" },
+  { name: "CSS",       icon: FileCode2,    accentColor: "#fb923c" },
+  { name: "PDF",       icon: FileText,     accentColor: "#34d399" },
+  { name: "Text",      icon: Type,         accentColor: "#38bdf8" },
 ];
 
 export const tools: ToolDefinition[] = [
@@ -367,7 +370,7 @@ export const tools: ToolDefinition[] = [
     highlights: ["Unicode-safe encode and decode"],
     icon: Binary,
   },
-  // ── Video tools ───────────────────────────────────────────────────────────
+
   {
     slug: "video-editor",
     href: "/video-editor",
@@ -390,7 +393,7 @@ export const tools: ToolDefinition[] = [
     highlights: ["Drag-to-reorder clips", "Resolution normalization"],
     icon: ListVideo,
   },
-  // ── PDF tools ─────────────────────────────────────────────────────────────
+
   {
     slug: "pdf-merger",
     href: "/pdf-merger",
@@ -446,7 +449,7 @@ export const tools: ToolDefinition[] = [
     highlights: ["Configurable render scale", "PNG & JPEG output"],
     icon: FileInput,
   },
-  // ── Text tools ────────────────────────────────────────────────────────────
+
   {
     slug: "md-editor",
     href: "/md-editor",
@@ -458,7 +461,7 @@ export const tools: ToolDefinition[] = [
     highlights: ["Live split-pane preview", "Toolbar shortcuts & PDF export"],
     icon: FileEdit,
   },
-  // ── Dev tools ─────────────────────────────────────────────────────────────
+
   {
     slug: "archive-extractor",
     href: "/archive-extractor",
@@ -492,7 +495,7 @@ export const toolsByCategory = toolCategories.map((category) => ({
   tools: tools.filter((tool) => tool.category === category.name),
 }));
 
-/** Returns the accent color hex for the category a tool belongs to. */
+
 export function getToolAccentColor(slug: string): string {
   const tool = getToolBySlug(slug);
   if (!tool) return "#60a5fa";

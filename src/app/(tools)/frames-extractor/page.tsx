@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import React, {
   useCallback,
@@ -33,7 +33,7 @@ export default function FramesExtractorPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("frames-extractor")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <FramesExtractorTool />
     </ToolPageShell>
   );

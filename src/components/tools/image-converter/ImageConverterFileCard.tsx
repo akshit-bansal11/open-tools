@@ -1,3 +1,6 @@
+// ImageConverterFileCard.tsx
+// Card component for managing and rendering individual image conversion operations.
+
 "use client";
 
 import React, { useState } from "react";

@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import React, { useState, useCallback, useEffect } from "react";
 import {
   Merge,
@@ -43,7 +43,7 @@ export default function PdfToolkitPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
-      accentColor={getToolAccentColor("pdf-toolkit")}
+     
     >
       <PdfToolkitTool />
     </ToolPageShell>

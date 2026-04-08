@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import React, { useState, useMemo } from "react";
 import {
   ArrowRightLeft,
@@ -32,7 +32,7 @@ export default function DiffCheckerPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
-      accentColor={getToolAccentColor("diff-checker")}
+     
     >
       <DiffCheckerTool />
     </ToolPageShell>

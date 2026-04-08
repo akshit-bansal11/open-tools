@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import React, { useState, useMemo } from "react";
 import {
   FileCode2,
@@ -33,7 +33,7 @@ export default function SvgOptimizerPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
-      accentColor={getToolAccentColor("svg-optimizer")}
+     
     >
       <SvgOptimizerTool />
     </ToolPageShell>

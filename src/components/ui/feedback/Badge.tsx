@@ -1,3 +1,6 @@
+// Badge.tsx
+// Small typographic indicator component typically used for statuses or tags.
+
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 

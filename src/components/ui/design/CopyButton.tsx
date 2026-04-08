@@ -1,3 +1,6 @@
+// CopyButton.tsx
+// Reusable button component that copies text to the clipboard and shows a success state.
+
 "use client";
 
 import { useState } from "react";

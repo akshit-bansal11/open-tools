@@ -49,6 +49,12 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function bytesToPdfBlob(bytes: Uint8Array): Blob {
+  const arrayBuffer = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(arrayBuffer).set(bytes);
+  return new Blob([arrayBuffer], { type: "application/pdf" });
+}
+
 function uid() {
   return Math.random().toString(36).slice(2, 9);
 }
@@ -133,7 +139,7 @@ function PdfMergerTool() {
         setProgress(Math.round(((i + 1) / files.length) * 90));
       }
       const bytes = await merged.save();
-      const blob = new Blob([bytes], { type: "application/pdf" });
+      const blob = bytesToPdfBlob(bytes);
       setOutputUrl(URL.createObjectURL(blob));
       setOutputSize(blob.size);
       setProgress(100);

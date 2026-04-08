@@ -1,6 +1,6 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import React, {
   useCallback,
@@ -57,7 +57,7 @@ export default function VideoConverterPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("video-converter")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <VideoConverterTool />
     </ToolPageShell>
   );

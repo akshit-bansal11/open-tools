@@ -1,3 +1,6 @@
+// FileDropZoneCard.tsx
+// Interactive card wrapper with drag-and-drop file upload capabilities.
+
 "use client";
 
 import React, { useCallback, useRef, useState } from "react";

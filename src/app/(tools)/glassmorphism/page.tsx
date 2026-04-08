@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import React, { useState, useMemo } from "react";
 import {
   Droplet,
@@ -29,7 +29,7 @@ export default function GlassmorphismPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
-      accentColor={getToolAccentColor("glassmorphism")}
+     
     >
       <GlassmorphismTool />
     </ToolPageShell>

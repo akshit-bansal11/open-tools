@@ -1,3 +1,6 @@
+// Tooltip.tsx
+// Floating informational popover for hovering or focusing UI elements.
+
 "use client";
 
 import * as React from "react";

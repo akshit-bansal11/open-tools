@@ -223,7 +223,8 @@ function ArchiveExtractorTool() {
   const handleSelect = (path: string, checked: boolean) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      checked ? next.add(path) : next.delete(path);
+      if (checked) next.add(path);
+      else next.delete(path);
       return next;
     });
   };
@@ -236,7 +237,6 @@ function ArchiveExtractorTool() {
     try {
       const JSZipNew = (await import("jszip")).default;
       const outZip = new JSZipNew();
-      let done = 0;
 
       zip.forEach((path, entry) => {
         if (!entry.dir) {

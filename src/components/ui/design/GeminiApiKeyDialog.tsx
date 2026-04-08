@@ -1,3 +1,6 @@
+// GeminiApiKeyDialog.tsx
+// Global dialog component for configuring and storing the Gemini API key.
+
 "use client";
 
 import { useState } from "react";

@@ -1,13 +1,13 @@
 "use client";
 
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import { ToolPageShell } from "@/components/common/ToolPageShell";
 import { useState } from "react";
 import { Download, GripVertical, Layers3, Plus, Trash2 } from "lucide-react";
-import { CopyButton } from "@/components/design-tools/CopyButton";
+import { CopyButton } from "@/components/ui/design/CopyButton";
 import { Label } from "@/components/ui/form/Label";
 import { Input } from "@/components/ui/form/Input";
-import { OutputField } from "@/components/design-tools/OutputField";
+import { OutputField } from "@/components/ui/design/OutputField";
 import { Badge } from "@/components/ui/feedback/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/layout/Card";
@@ -35,7 +35,7 @@ export default function GradientMakerPage() {
   }
 
   return (
-    <ToolPageShell title={tool.name} description={tool.description} accentColor={getToolAccentColor("gradient-maker")}>
+    <ToolPageShell title={tool.name} description={tool.description}>
       <GradientMakerTool />
     </ToolPageShell>
   );

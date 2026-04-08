@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolPageShell } from "@/components/common/ToolPageShell";
-import { getToolBySlug, getToolAccentColor } from "@/config/tools";
+import { getToolBySlug } from "@/config/tools";
 import React, { useCallback, useState, useEffect } from "react";
 import {
   FileImage,
@@ -41,7 +41,7 @@ export default function PdfConverterPage() {
     <ToolPageShell
       title={tool.name}
       description={tool.description}
-      accentColor={getToolAccentColor("pdf-converter")}
+     
     >
       <PdfConverterTool />
     </ToolPageShell>

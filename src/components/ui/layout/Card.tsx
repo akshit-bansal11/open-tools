@@ -1,3 +1,6 @@
+// Card.tsx
+// Essential layout container component with border and background styling.
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
