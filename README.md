@@ -1,18 +1,20 @@
 # open-tools
 
-A growing collection of fast, local-first browser utilities for developers and designers — no logins, no uploads to servers, no fluff.
-
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)](https://www.typescriptlang.org)
 [![React](https://img.shields.io/badge/React-19-149eca)](https://react.dev)
 [![Local-first](https://img.shields.io/badge/Platform-Local--first-22c55e)](https://github.com/akshit-bansal11/open-tools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> Built with Next.js 16, TypeScript, Tailwind CSS, and shadcn/ui. Each tool lives at its own route under `app/(tools)/`. Adding a new tool is as simple as dropping a route and registering it in the central tool registry.
+## Project Name + Description
+
+**open-tools** is a growing collection of fast, local-first browser utilities for developers and designers — no logins, no uploads to servers, no fluff.
+
+Each tool lives at its own route under `app/(tools)/`. Adding a new tool is as simple as dropping a route and registering it in the central tool registry.
 
 ---
 
-## Tools
+## Features
 
 ### ✅ Currently Available
 
@@ -63,27 +65,20 @@ A growing collection of fast, local-first browser utilities for developers and d
 
 ---
 
-## Getting Started
+## Tech Stack
 
-```bash
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-```bash
-# Production build
-npm run build
-npm start
-```
+- **Framework/App Runtime:** Next.js 16, React 19
+- **Language:** TypeScript
+- **Styling/UI:** Tailwind CSS, shadcn/ui (Radix UI primitives + `class-variance-authority` + `tailwind-merge`)
+- **Media processing:** FFmpeg.wasm (`@ffmpeg/ffmpeg`, `@ffmpeg/util`), ImageMagick (`@imagemagick/magick-wasm`)
+- **Document/Image tooling:** `pdf-lib`, `pdfjs-dist`, `jszip`, `svgo`
+- **Text/utility tooling:** `diff`, `marked`, `dompurify`
 
 ---
 
-## Project Structure
+## Directory Structure
+
+Tool-based architecture: each utility has its own route in `src/app/(tools)/<tool-name>/` with a local `_components` folder.
 
 ```
 src/
@@ -245,14 +240,26 @@ The homepage is fully driven by `config/tools.ts`. New tools auto-appear on the 
 
 ---
 
-## Scripts
+## Running Steps
 
 ```bash
-npm run dev      # start dev server
-npm run build    # production build
-npm run start    # start production server
-npm run lint     # run ESLint
+# 1) Install dependencies
+npm install
+
+# 2) Start development server
+npm run dev
+
+# 3) Build for production
+npm run build
+
+# 4) Start production server
+npm run start
+
+# 5) Run lint checks
+npm run lint
 ```
+
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
