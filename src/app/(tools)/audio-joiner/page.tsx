@@ -188,13 +188,14 @@ function AudioJoinerTool() {
     const codec = CODEC_FOR_FORMAT[outputFormat] ?? "libmp3lame";
 
     try {
-      // Step 1 — write & (optionally) pre-trim each track
+      // Step 1 — write and normalize each track to an intermediate WAV.
+      // Concat demuxer requires homogeneous stream params across all inputs.
       const processedNames: string[] = [];
       for (let i = 0; i < tracks.length; i++) {
         const track = tracks[i];
         const ext = getFileExtension(track.file.name) || "mp3";
         const rawName = `${jobId}_raw_${i}.${ext}`;
-        const trimmedName = `${jobId}_t${i}.${outputFormat}`;
+        const normalizedName = `${jobId}_n${i}.wav`;
 
         setProgressLabel(`Processing track ${i + 1} / ${tracks.length}…`);
         setProgress(Math.round((i / tracks.length) * 60));
@@ -203,19 +204,22 @@ function AudioJoinerTool() {
 
         const hasTrim = track.trimStart > 0 || (track.trimEnd !== null && track.trimEnd < track.duration - 0.05);
 
+        const args = ["-i", rawName];
         if (hasTrim) {
           const trimEnd = track.trimEnd ?? track.duration;
-          await ffmpeg.exec([
-            "-i", rawName,
-            "-ss", String(track.trimStart),
-            "-to", String(trimEnd),
-            "-c:a", codec,
-            trimmedName,
-          ]);
-          processedNames.push(trimmedName);
-        } else {
-          processedNames.push(rawName);
+          args.push("-ss", String(track.trimStart), "-to", String(trimEnd));
         }
+
+        args.push(
+          "-vn",
+          "-ac", "2",
+          "-ar", "48000",
+          "-c:a", "pcm_s16le",
+          normalizedName,
+        );
+
+        await ffmpeg.exec(args);
+        processedNames.push(normalizedName);
       }
 
       // Step 2 — build concat.txt
